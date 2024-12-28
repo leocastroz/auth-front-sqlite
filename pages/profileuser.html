@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil do Usuário</title>
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body onload="checkAuth(); loadUserProfile();">
+    <div class="container">
+        <h2>Perfil do Usuário</h2>
+        <form id="profile-form" onsubmit="event.preventDefault(); saveUserProfile();">
+            <label for="base_img">Imagem de Perfil:</label>
+            <input type="text" id="base_img" required>
+            <label for="age">Idade:</label>
+            <input type="number" id="age" maxlength="4" required>
+            <label for="nickname">Apelido:</label>
+            <input type="text" id="nickname" required>
+            <button id="profile-button" type="submit">Salvar Perfil</button>
+        </form>
+    </div>
+    <div id="toast" class="toast"></div>
+    <script src="../js/scripts.js"></script>
+</body>
+</html>

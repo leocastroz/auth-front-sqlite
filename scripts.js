@@ -4,6 +4,8 @@ const baseURL = isLocalhost ? 'http://localhost:3000/' : 'https://auth-sqlite.fl
 let currentPage = 1;
 const itemsPerPage = 3;
 let products = [];
+let userId;
+let profileId;
 
 async function login() {
     const username = document.getElementById('login-username').value;
@@ -93,7 +95,7 @@ function showToast(message, type) {
     }
 }
 
-function loadContent(page) {
+function loadContent(page, element) {
     fetch(page)
         .then(response => response.text())
         .then(data => {
@@ -101,9 +103,35 @@ function loadContent(page) {
             if (page === 'products.html') {
                 loadProducts();
             }
+            if (page === 'profileuser.html') {
+                loadUserProfile();
+            }
+
+            // Remover a classe 'selected' de todos os itens de navegação
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => item.classList.remove('selected'));
+
+            // Adicionar a classe 'selected' ao item de navegação clicado
+            if (element) {
+                element.classList.add('selected');
+            }
+
+            // Remover a classe 'selected' do item com o ID 'marked' se outro item for selecionado
+            const markedItem = document.getElementById('marked');
+            if (markedItem && markedItem !== element) {
+                markedItem.classList.remove('selected');
+            }
         })
         .catch(error => console.error('Error loading content:', error));
 }
+
+// Adicionar a classe 'selected' ao item padrão ao carregar a página
+document.addEventListener('DOMContentLoaded', () => {
+    const defaultNavItem = document.getElementById('marked');
+    if (defaultNavItem) {
+        defaultNavItem.classList.add('selected');
+    }
+});
 
 async function createProduct(name, value) {
     const token = localStorage.getItem('token');
@@ -184,4 +212,81 @@ function addProduct() {
     const name = document.getElementById('product-name').value;
     const value = document.getElementById('product-value').value;
     createProduct(name, value);
+}
+
+// Funções para carregar e salvar o perfil do usuário
+async function loadUserProfile() {
+    const token = localStorage.getItem('token');
+
+    const response = await fetch(`${baseURL}profile`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'x-access-token': token
+        }
+    });
+
+    if (response.ok) {
+        const profile = await response.json();
+        document.getElementById('base_img').value = profile.base_img;
+        document.getElementById('age').value = profile.age;
+        document.getElementById('nickname').value = profile.nickname;
+
+        // Armazenar id e user_id
+        profileId = profile.id;
+        userId = profile.user_id;
+
+        // Substituir o botão "Salvar Perfil" pelo botão "Editar Perfil"
+        const profileButton = document.getElementById('profile-button');
+        profileButton.textContent = 'Editar Perfil';
+        profileButton.setAttribute('onclick', 'updateUserProfile()');
+    } else {
+        showToast('Erro ao carregar perfil', 'error');
+    }
+}
+
+async function saveUserProfile() {
+    const token = localStorage.getItem('token');
+    const base_img = document.getElementById('base_img').value;
+    const age = document.getElementById('age').value;
+    const nickname = document.getElementById('nickname').value;
+
+    const response = await fetch(`${baseURL}profile`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'x-access-token': token
+        },
+        body: JSON.stringify({ base_img, age, nickname }),
+    });
+
+    if (response.status === 200) {
+        showToast('Perfil salvo com sucesso!', 'success');
+    } else {
+        const data = await response.json();
+        showToast(data.message, 'error');
+    }
+}
+
+async function updateUserProfile() {
+    const token = localStorage.getItem('token');
+    const base_img = document.getElementById('base_img').value;
+    const age = document.getElementById('age').value;
+    const nickname = document.getElementById('nickname').value;
+
+    const response = await fetch(`${baseURL}profile`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'x-access-token': token
+        },
+        body: JSON.stringify({ id: profileId, user_id: userId, base_img, age, nickname }),
+    });
+
+    if (response.status === 200) {
+        showToast('Perfil atualizado com sucesso!', 'success');
+    } else {
+        const data = await response.json();
+        showToast(data.message, 'error');
+    }
 }
