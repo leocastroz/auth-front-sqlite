@@ -1,8 +1,15 @@
+const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+const baseURL = isLocalhost ? 'http://localhost:3000/' : 'https://auth-sqlite.fly.dev/';
+
+let currentPage = 1;
+const itemsPerPage = 3;
+let products = [];
+
 async function login() {
     const username = document.getElementById('login-username').value;
     const password = document.getElementById('login-password').value;
 
-    const response = await fetch('https://auth-sqlite.fly.dev/login', {
+    const response = await fetch(`${baseURL}login`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -19,7 +26,7 @@ async function login() {
         showToast('Login bem-sucedido!', 'success');
         setTimeout(() => {
             window.location.href = 'dashboard.html';
-        }, 3000);
+        }, 1500);
     } else {
         showToast(data.message, 'error');
     }
@@ -29,7 +36,7 @@ async function register() {
     const username = document.getElementById('register-username').value;
     const password = document.getElementById('register-password').value;
 
-    const response = await fetch('https://auth-sqlite.fly.dev/register', {
+    const response = await fetch(`${baseURL}register`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -92,15 +99,7 @@ function loadContent(page) {
         .then(data => {
             document.getElementById('content').innerHTML = data;
             if (page === 'products.html') {
-                getProducts().then(products => {
-                    const productList = document.getElementById('product-list');
-                    productList.innerHTML = '';
-                    products.forEach(product => {
-                        const li = document.createElement('li');
-                        li.textContent = `Nome: ${product.name}, Valor: ${product.value}`;
-                        productList.appendChild(li);
-                    });
-                });
+                loadProducts();
             }
         })
         .catch(error => console.error('Error loading content:', error));
@@ -109,7 +108,7 @@ function loadContent(page) {
 async function createProduct(name, value) {
     const token = localStorage.getItem('token');
 
-    const response = await fetch('https://auth-sqlite.fly.dev/products', {
+    const response = await fetch(`${baseURL}products`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -128,9 +127,9 @@ async function createProduct(name, value) {
 }
 
 async function getProducts() {
-    const token = localStorage.getItem('token'); // Obtém o token do localStorage
+    const token = localStorage.getItem('token');
 
-    const response = await fetch('https://auth-sqlite.fly.dev/products', {
+    const response = await fetch(`${baseURL}products`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
@@ -139,7 +138,7 @@ async function getProducts() {
     });
 
     if (response.ok) {
-        const products = await response.json();
+        products = await response.json();
         return products;
     } else {
         showToast('Erro ao obter produtos', 'error');
@@ -148,14 +147,37 @@ async function getProducts() {
 }
 
 async function loadProducts() {
-    const products = await getProducts();
+    await getProducts();
+    displayProducts();
+}
+
+function displayProducts() {
     const productList = document.getElementById('product-list');
     productList.innerHTML = '';
-    products.forEach(product => {
-        const li = document.createElement('li');
-        li.textContent = `Nome: ${product.name}, Valor: ${product.value}`;
-        productList.appendChild(li);
-    });
+
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = Math.min(startIndex + itemsPerPage, products.length);
+
+    for (let i = startIndex; i < endIndex; i++) {
+        const product = products[i];
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${i + 1}</td><td>${product.name}</td><td>${product.value}</td>`;
+        productList.appendChild(tr);
+    }
+}
+
+function nextPage() {
+    if (currentPage * itemsPerPage < products.length) {
+        currentPage++;
+        displayProducts();
+    }
+}
+
+function prevPage() {
+    if (currentPage > 1) {
+        currentPage--;
+        displayProducts();
+    }
 }
 
 function addProduct() {
