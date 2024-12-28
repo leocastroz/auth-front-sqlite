@@ -7,14 +7,28 @@
     <link rel="icon" type="image/x-icon" href="../assets/favicon.ico">
     <link rel="stylesheet" href="../styles/dashboard.css">
 </head>
-<body onload="checkAuth(); displayUsername();">
+<body onload="checkAuth(); displayUsername(); loadContent('layout1.html');">
     <div class="container">
         <div id="dashboard">
-            <h2>Bem-vindo ao Dashboard</h2>
-            <p id="welcome-message">Você está logado!</p>
-            <button onclick="logout()">Logout</button>
+            <div class="container-dashboard">
+                <img src="../assets/favicon.ico" alt="Logo" id="logo">
+                <div>
+                    <h2>Welcome to dashboard</h2>
+                    <p id="welcome-message">Você está logado!</p>
+                    <button onclick="logout()">Logout</button>
+                </div>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="#" onclick="loadContent('layout1.html')">Layout 1</a></li>
+                    <li><a href="#" onclick="loadContent('layout2.html')">Layout 2</a></li>
+                    <li><a href="#" onclick="loadContent('products.html')">Products</a></li>
+                </ul>
+            </nav>
+            <div id="content" class="content-page"></div>
         </div>
     </div>
+    <div id="toast" class="toast"></div>
     <script src="../scripts.js"></script>
 </body>
 </html>

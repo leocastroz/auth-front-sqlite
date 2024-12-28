@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Produtos</title>
+    <link rel="stylesheet" href="../styles.css">
+    <!-- <link rel="stylesheet" href="../styles/products.css"> -->
+</head>
+<body onload="checkAuth(); getProducts();loadProducts();">
+    <div class="container">
+        <h2>Cadastro de Produtos</h2>
+        <form id="product-form" onsubmit="event.preventDefault(); addProduct();">
+            <label for="product-name">Nome do Produto:</label>
+            <input type="text" id="product-name" required>
+            <label for="product-value">Valor do Produto:</label>
+            <input type="number" id="product-value" required>
+            <button type="submit">Cadastrar Produto</button>
+        </form>
+        <h2>Lista de Produtos</h2>
+        <ul id="product-list"></ul>
+      </div>
+      <div id="toast" class="toast"></div>
+    
+    <script src="../scripts.js"></script>
+</body>
+</html>
