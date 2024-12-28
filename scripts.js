@@ -15,7 +15,7 @@ async function login() {
     if (data.auth) {
         localStorage.setItem('auth', 'true');
         localStorage.setItem('username', username);
-        localStorage.setItem('token', data.token); // Armazena o token
+        localStorage.setItem('token', data.token);
         showToast('Login bem-sucedido!', 'success');
         setTimeout(() => {
             window.location.href = 'dashboard.html';
@@ -41,7 +41,7 @@ async function register() {
         const data = await response.json();
         localStorage.setItem('auth', 'true');
         localStorage.setItem('username', username);
-        localStorage.setItem('token', data.token); // Armazena o token
+        localStorage.setItem('token', data.token);
         showToast('Registro bem-sucedido!', 'success');
         setTimeout(() => {
             window.location.href = 'dashboard.html';
@@ -61,7 +61,7 @@ function checkAuth() {
 function logout() {
     localStorage.removeItem('auth');
     localStorage.removeItem('username');
-    localStorage.removeItem('token'); // Remove o token
+    localStorage.removeItem('token');
     window.location.href = 'login.html';
 }
 
