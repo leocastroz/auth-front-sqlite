@@ -30,7 +30,7 @@ body {
   width: 100px;
   height: 100px;
   border-radius: 50%;
-  background-image: url('/assets/nophoto.jpg');
+  background-image: url('/assets/nophoto.webp');
   background-size: cover;
   background-repeat: no-repeat;
 }

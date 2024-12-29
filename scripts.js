@@ -20,11 +20,13 @@ async function login() {
     });
 
     const data = await response.json();
-
+    // console.log('data ->', data);
     if (data.auth) {
         localStorage.setItem('auth', 'true');
         localStorage.setItem('username', username);
         localStorage.setItem('token', data.token);
+        localStorage.setItem('user_id', data.userId);
+        localStorage.setItem('baseImg', data.baseImg);
         showToast('Login bem-sucedido!', 'success');
         setTimeout(() => {
             window.location.href = 'dashboard.html';
@@ -71,14 +73,26 @@ function logout() {
     localStorage.removeItem('auth');
     localStorage.removeItem('username');
     localStorage.removeItem('token');
+    localStorage.removeItem('user_id');
+    localStorage.removeItem('baseImg');
+    localStorage.removeItem('nickname');
     window.location.href = 'login.html';
 }
 
 function displayUsername() {
     const username = localStorage.getItem('username');
+    const baseImg = localStorage.getItem('baseImg');
+    const nickname = localStorage.getItem('nickname');
+    // console.log('baseImg ->', baseImg);
     if (username) {
         document.getElementById('welcome-message').textContent = `Bem-vindo, ${username}!`;
     }
+    if (baseImg) {
+        document.getElementById('profile-img').src = baseImg;
+    }
+    // if (nickname) {
+    //     document.getElementById('profile-nickname').textContent = `Apelido: ${nickname}`;
+    // }
 }
 
 function showToast(message, type) {
@@ -243,7 +257,7 @@ function addProduct() {
 async function loadUserProfile() {
     const token = localStorage.getItem('token');
 
-    const response = await fetch(`${baseURL}profile`, {
+    const response = await fetch(`${baseURL}user`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
@@ -253,15 +267,16 @@ async function loadUserProfile() {
 
     if (response.ok) {
         const profile = await response.json();
-        document.getElementById('base_img').value = profile.base_img;
-        document.getElementById('age').value = profile.age;
+        // console.log('profile ->', profile);
+        document.getElementById('baseImg').value = profile.baseImg;
         document.getElementById('nickname').value = profile.nickname;
 
-        // Armazenar id e user_id
         profileId = profile.id;
         userId = profile.user_id;
 
-        // Substituir o botão "Salvar Perfil" pelo botão "Editar Perfil"
+        localStorage.setItem('baseImg', profile.baseImg);
+        localStorage.setItem('nickname', profile.nickname);
+
         const profileButton = document.getElementById('profile-button');
         profileButton.textContent = 'Editar Perfil';
         profileButton.setAttribute('onclick', 'updateUserProfile()');
@@ -270,46 +285,33 @@ async function loadUserProfile() {
     }
 }
 
-async function saveUserProfile() {
-    const token = localStorage.getItem('token');
-    const base_img = document.getElementById('base_img').value;
-    const age = document.getElementById('age').value;
-    const nickname = document.getElementById('nickname').value;
-
-    const response = await fetch(`${baseURL}profile`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'x-access-token': token
-        },
-        body: JSON.stringify({ base_img, age, nickname }),
-    });
-
-    if (response.status === 200) {
-        showToast('Perfil salvo com sucesso!', 'success');
-    } else {
-        const data = await response.json();
-        showToast(data.message, 'error');
-    }
-}
 
 async function updateUserProfile() {
     const token = localStorage.getItem('token');
-    const base_img = document.getElementById('base_img').value;
-    const age = document.getElementById('age').value;
+    const userId = localStorage.getItem('user_id');
+    const baseImg = document.getElementById('baseImg').value;
     const nickname = document.getElementById('nickname').value;
 
-    const response = await fetch(`${baseURL}profile`, {
+    const response = await fetch(`${baseURL}users`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
             'x-access-token': token
         },
-        body: JSON.stringify({ id: profileId, user_id: userId, base_img, age, nickname }),
+        body: JSON.stringify({ user_id: userId, baseImg, nickname }),
     });
 
     if (response.status === 200) {
         showToast('Perfil atualizado com sucesso!', 'success');
+
+        // Armazenar dados atualizados do perfil no localStorage
+        localStorage.setItem('baseImg', baseImg);
+        localStorage.setItem('nickname', nickname);
+
+        // Redirecionar para dashboard.html para exibir os dados atualizados
+        setTimeout(() => {
+            window.location.href = 'dashboard.html';
+        }, 1500);
     } else {
         const data = await response.json();
         showToast(data.message, 'error');
