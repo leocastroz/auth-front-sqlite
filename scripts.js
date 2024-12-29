@@ -189,8 +189,33 @@ function displayProducts() {
     for (let i = startIndex; i < endIndex; i++) {
         const product = products[i];
         const tr = document.createElement('tr');
-        tr.innerHTML = `<td>${i + 1}</td><td>${product.name}</td><td>${product.value}</td>`;
+        tr.innerHTML = `
+            <td>${i + 1}</td>
+            <td>${product.name}</td>
+            <td>${product.value}</td>
+            <td><button onclick="deleteProduct(${product.id})">Deletar</button></td>
+        `;
         productList.appendChild(tr);
+    }
+}
+
+async function deleteProduct(id) {
+    const token = localStorage.getItem('token');
+
+    const response = await fetch(`${baseURL}products/${id}`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+            'x-access-token': token
+        }
+    });
+
+    if (response.status === 200) {
+        showToast('Produto deletado com sucesso!', 'success');
+        loadProducts(); // Atualiza a lista de produtos após deletar
+    } else {
+        const data = await response.json();
+        showToast(data.message, 'error');
     }
 }
 
