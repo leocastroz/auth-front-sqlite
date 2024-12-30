@@ -50,6 +50,10 @@ nav ul li {
   list-style: none;
 }
 
+.active {
+  background-color: #ddd;
+}
+
 .content-page {
   background-color: white;
   padding: 20px;

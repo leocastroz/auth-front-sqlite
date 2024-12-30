@@ -124,13 +124,37 @@ function showToast(message, type) {
     }
 }
 
-function loadContent(page, element) {
-    localStorage.getItem('role');
-    const role = localStorage.getItem('role');
+function loadContent(page, elementId) {
     fetch(page).then(response => response.text()).then(data => {
         document.getElementById('content').innerHTML = data;
         if (page === 'products.html') loadProducts();
         if (page === 'profileuser.html') loadUserProfile();
+        
+        document.querySelectorAll('ul li').forEach(item => item.classList.remove('active'));
+        const activeElement = document.getElementById(elementId);
+        const role = localStorage.getItem('role');
+        if (activeElement) {
+            activeElement.classList.add('active');
+        } else {
+
+            if (role === 'admin') {
+                const firstItem = document.getElementById('layout1adm');
+                if (firstItem) {
+                    firstItem.classList.add('active');
+                } else {
+                    console.error('Elemento com id layout1adm não encontrado');
+                }
+            } 
+            
+            if (role === 'user') {
+                const firstItem = document.getElementById('layout1');
+                if (firstItem) {
+                    firstItem.classList.add('active');
+                } else {
+                    console.error('Elemento com id layout1adm não encontrado');
+                }
+            }
+        }
     }).catch(error => console.error('Error loading content:', error));
 }
 
@@ -239,7 +263,6 @@ function addProduct() {
     createProduct(name, value);
 }
 
-// Funções para carregar e salvar o perfil do usuário
 async function loadUserProfile() {
     const token = localStorage.getItem('token');
 
@@ -290,11 +313,11 @@ async function updateUserProfile() {
     if (response.status === 200) {
         showToast('Perfil atualizado com sucesso!', 'success');
 
-        // Armazenar dados atualizados do perfil no localStorage
+        
         localStorage.setItem('baseImg', baseImg);
         localStorage.setItem('nickname', nickname);
 
-        // Redirecionar para dashboard.html para exibir os dados atualizados
+        
         setTimeout(() => {
             window.location.href = 'dashboard.html';
         }, 1500);

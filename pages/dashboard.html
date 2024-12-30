@@ -21,10 +21,10 @@
             </div>
             <nav>
                 <ul>
-                    <li><a onclick="loadContent('layout1.html')">Layout 1</a></li>
-                    <li><a onclick="loadContent('layout2.html')">Layout 2</a></li>
-                    <li><a onclick="loadContent('products.html')">Products</a></li>
-                    <li><a onclick="loadContent('profileuser.html')">Profile</a></li>
+                    <li id="layout1"><a onclick="loadContent('layout1.html', 'layout1')">Layout 1</a></li>
+                    <li id="layout2"><a onclick="loadContent('layout2.html', 'layout2')">Layout 2</a></li>
+                    <li id="products"><a onclick="loadContent('products.html', 'products')">Products</a></li>
+                    <li id="profileuser"><a onclick="loadContent('profileuser.html', 'profileuser')">Profile</a></li>
                 </ul>
             </nav>
             <div id="content" class="content-page"></div>
