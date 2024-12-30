@@ -65,6 +65,27 @@ async function register() {
     }
 }
 
+async function reset() {
+    const username = document.getElementById('username').value;
+    const newPassword = document.getElementById('newPassword').value;
+
+    const response = await fetch(`${baseURL}reset-password`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ username, newPassword }),
+    });
+
+    if (response.ok) {
+        showToast('Senha alterada com sucesos!', 'success');
+    } else {
+        const data = await response.json();
+        alert(`Error: ${data.message}`);
+    }        
+
+}
+
 function checkAuth() {
     if (localStorage.getItem('auth') !== 'true') {
         window.location.href = 'login.html';
