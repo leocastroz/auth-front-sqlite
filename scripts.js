@@ -20,16 +20,17 @@ async function login() {
     });
 
     const data = await response.json();
-    // console.log('data ->', data);
     if (data.auth) {
         localStorage.setItem('auth', 'true');
         localStorage.setItem('username', username);
         localStorage.setItem('token', data.token);
         localStorage.setItem('user_id', data.userId);
         localStorage.setItem('baseImg', data.baseImg);
+        localStorage.setItem('role', data.role);
         showToast('Login bem-sucedido!', 'success');
+        const redirectPage = data.role === 'admin' ? 'dashboardadmin.html' : 'dashboard.html';
         setTimeout(() => {
-            window.location.href = 'dashboard.html';
+            window.location.href = redirectPage;
         }, 1500);
     } else {
         showToast(data.message, 'error');
@@ -39,13 +40,14 @@ async function login() {
 async function register() {
     const username = document.getElementById('register-username').value;
     const password = document.getElementById('register-password').value;
+    const role = document.getElementById('register-role').value;
 
     const response = await fetch(`${baseURL}register`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify({ username, password, role }),
     });
 
     if (response.status === 201) {
@@ -53,10 +55,10 @@ async function register() {
         localStorage.setItem('auth', 'true');
         localStorage.setItem('username', username);
         localStorage.setItem('token', data.token);
+        localStorage.setItem('user_id', data.userId);
+        localStorage.setItem('baseImg', data.baseImg);
+        localStorage.setItem('role', data.role);
         showToast('Registro bem-sucedido!', 'success');
-        setTimeout(() => {
-            window.location.href = 'dashboard.html';
-        }, 3000);
     } else {
         const data = await response.json();
         showToast(data.message, 'error');
@@ -76,23 +78,15 @@ function logout() {
     localStorage.removeItem('user_id');
     localStorage.removeItem('baseImg');
     localStorage.removeItem('nickname');
+    localStorage.removeItem('role');
     window.location.href = 'login.html';
 }
 
 function displayUsername() {
     const username = localStorage.getItem('username');
     const baseImg = localStorage.getItem('baseImg');
-    const nickname = localStorage.getItem('nickname');
-    // console.log('baseImg ->', baseImg);
-    if (username) {
-        document.getElementById('welcome-message').textContent = `Bem-vindo, ${username}!`;
-    }
-    if (baseImg) {
-        document.getElementById('profile-img').src = baseImg;
-    }
-    // if (nickname) {
-    //     document.getElementById('profile-nickname').textContent = `Apelido: ${nickname}`;
-    // }
+    if (username) document.getElementById('welcome-message').textContent = `Bem-vindo, ${username}!`;
+    if (baseImg) document.getElementById('profile-img').src = baseImg; 
 }
 
 function showToast(message, type) {
@@ -110,46 +104,18 @@ function showToast(message, type) {
 }
 
 function loadContent(page, element) {
-    fetch(page)
-        .then(response => response.text())
-        .then(data => {
-            document.getElementById('content').innerHTML = data;
-            if (page === 'products.html') {
-                loadProducts();
-            }
-            if (page === 'profileuser.html') {
-                loadUserProfile();
-            }
-
-            // Remover a classe 'selected' de todos os itens de navegação
-            const navItems = document.querySelectorAll('.nav-item');
-            navItems.forEach(item => item.classList.remove('selected'));
-
-            // Adicionar a classe 'selected' ao item de navegação clicado
-            if (element) {
-                element.classList.add('selected');
-            }
-
-            // Remover a classe 'selected' do item com o ID 'marked' se outro item for selecionado
-            const markedItem = document.getElementById('marked');
-            if (markedItem && markedItem !== element) {
-                markedItem.classList.remove('selected');
-            }
-        })
-        .catch(error => console.error('Error loading content:', error));
+    localStorage.getItem('role');
+    const role = localStorage.getItem('role');
+    fetch(page).then(response => response.text()).then(data => {
+        document.getElementById('content').innerHTML = data;
+        if (page === 'products.html') loadProducts();
+        if (page === 'profileuser.html') loadUserProfile();
+    }).catch(error => console.error('Error loading content:', error));
 }
 
-// Adicionar a classe 'selected' ao item padrão ao carregar a página
-document.addEventListener('DOMContentLoaded', () => {
-    const defaultNavItem = document.getElementById('marked');
-    if (defaultNavItem) {
-        defaultNavItem.classList.add('selected');
-    }
-});
 
 async function createProduct(name, value) {
     const token = localStorage.getItem('token');
-
     const response = await fetch(`${baseURL}products`, {
         method: 'POST',
         headers: {
@@ -170,7 +136,6 @@ async function createProduct(name, value) {
 
 async function getProducts() {
     const token = localStorage.getItem('token');
-
     const response = await fetch(`${baseURL}products`, {
         method: 'GET',
         headers: {
@@ -226,7 +191,7 @@ async function deleteProduct(id) {
 
     if (response.status === 200) {
         showToast('Produto deletado com sucesso!', 'success');
-        loadProducts(); // Atualiza a lista de produtos após deletar
+        loadProducts();
     } else {
         const data = await response.json();
         showToast(data.message, 'error');

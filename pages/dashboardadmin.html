@@ -3,19 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register - user</title>
+    <title>ADMIN</title>
     <link rel="icon" type="image/x-icon" href="../assets/favicon.ico">
-    <link rel="stylesheet" href="../styles.css">
+    <link rel="stylesheet" href="../styles/dashboard.css">
 </head>
-<body>
+<body onload="checkAuth(); displayUsername();loadContent('admin/layout1adm.html');">
     <div class="container">
-        <div id="register-form" class="form">
-            <h2>Registro</h2>
-            <input type="text" id="register-username" placeholder="Username">
-            <input type="password" id="register-password" placeholder="Password">
-            <input type="text" id="register-role" placeholder="Role">
-            <button onclick="register()">Registrar</button>
-            <p>Já tem uma conta? <a href="login.html">Login</a></p>
+        <div id="dashboard">
+            <div class="container-dashboard">
+                <img id="profile-img" src="" alt="">
+                <!-- <img src="../assets/favicon.ico" alt="Logo" id="logo"> -->
+                <div>
+                    <h2>Dashboard admin</h2>
+                    <p id="welcome-message">Você está logado!</p>
+                    <button onclick="logout()">Logout</button>
+                </div>
+            </div>
+            <nav>
+                <ul>
+                    <li><a onclick="loadContent('admin/layout1adm.html')">Layout 1 adm</a></li>
+                    <li><a onclick="loadContent('admin/layout2adm.html')">Layout 2 adm</a></li>
+                    <!-- <li><a onclick="loadContent('products.html')">Products</a></li>
+                    <li><a onclick="loadContent('profileuser.html')">Profile</a></li> -->
+                </ul>
+            </nav>
+            <div id="content" class="content-page"></div>
         </div>
     </div>
     <script src="../scripts.js"></script>
